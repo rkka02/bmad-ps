@@ -1,0 +1,416 @@
+template:
+  id: decision-record-v1
+  name: Architectural Decision Record (ADR)
+  version: 1.0
+  output:
+    format: markdown
+    filename: docs/decisions/ADR-{{number}}-{{slug}}.md
+    title: "ADR-{{number}}: {{decision_title}}"
+
+workflow:
+  mode: interactive
+  elicitation: focused
+
+metadata:
+  - id: number
+    title: ADR Number
+    type: auto-increment
+    prefix: ADR-
+    start: 1
+    instruction: Automatically assigns next available ADR number
+  
+  - id: decision_title
+    title: Decision Title
+    type: text
+    max_length: 100
+    instruction: |
+      Concise, descriptive title for this decision.
+      Use active voice and be specific about what was decided.
+      Examples:
+      - "Use React for Frontend Framework"
+      - "Implement Microservices Architecture"
+      - "Adopt PostgreSQL for Primary Database"
+  
+  - id: slug
+    title: URL Slug
+    type: auto-generated
+    from: decision_title
+    transform: lowercase-hyphenated
+    instruction: Auto-generated from decision title for file naming
+  
+  - id: date
+    title: Decision Date
+    type: date
+    default: today
+    instruction: Date when this decision was made (not when ADR was written)
+  
+  - id: status
+    title: Status
+    type: select
+    options: [Proposed, Accepted, Deprecated, Superseded]
+    default: Proposed
+    instruction: |
+      Current status of this decision:
+      - Proposed: Under consideration, not yet final
+      - Accepted: Decision is final and being implemented
+      - Deprecated: No longer relevant or being phased out
+      - Superseded: Replaced by a newer decision (reference the new ADR)
+  
+  - id: supersedes
+    title: Supersedes
+    type: text
+    condition: status == "Superseded"
+    instruction: "If superseded, reference the ADR number that replaces this (e.g., 'ADR-015')"
+  
+  - id: superseded_by
+    title: Superseded By
+    type: text
+    condition: status == "Deprecated"
+    instruction: "If superseding another ADR, reference the previous ADR number (e.g., 'ADR-003')"
+
+sections:
+  - id: context
+    title: Context
+    instruction: |
+      Describe the forces at play that led to this decision:
+      - What is the issue motivating this decision?
+      - What constraints exist (technical, business, organizational)?
+      - What patterns or trends have we observed?
+      - What are the key stakeholder concerns or requirements?
+      
+      Focus on the situation and environment that makes this decision necessary.
+      Avoid describing solutions here - just the context that creates the need to decide.
+    elicit: true
+    type: paragraphs
+    min_length: 200
+    prompts:
+      - "What problem are we trying to solve?"
+      - "What constraints or requirements must we satisfy?"
+      - "What patterns have we observed that led to this decision point?"
+      - "What are the key stakeholder concerns?"
+      - "What external factors are influencing this decision?"
+    examples: |
+      **Example Context:**
+      "Our current monolithic architecture is becoming difficult to maintain and scale. 
+      Development velocity has decreased as the codebase has grown, with deployment taking 
+      45 minutes and requiring coordination across 5 teams. Customer traffic has increased 
+      300% over the past year, and we're hitting performance bottlenecks during peak hours. 
+      The development team has grown from 8 to 25 engineers, making code conflicts and 
+      integration issues more frequent. Additionally, different parts of the system have 
+      different scalability requirements, but our current architecture forces us to scale 
+      everything together."
+
+  - id: decision-process
+    title: Decision Process
+    instruction: |
+      Document how this decision was reached to provide transparency and enable future learning.
+      This helps others understand the rigor and thought process behind the decision.
+    elicit: true
+    sections:
+      - id: options-considered
+        title: Options Considered
+        type: numbered-list
+        min_items: 2
+        instruction: |
+          List all significant alternatives that were seriously evaluated.
+          For each option, provide a brief description of the approach.
+          Include both the options that were rejected and the one that was chosen.
+        examples:
+          - "Continue with monolithic architecture and optimize performance bottlenecks"
+          - "Migrate to microservices architecture with domain-driven service boundaries"  
+          - "Adopt serverless architecture using AWS Lambda and API Gateway"
+          - "Hybrid approach: Extract high-traffic services while keeping core monolith"
+      
+      - id: evaluation-method
+        title: Evaluation Method
+        type: text
+        instruction: |
+          How were the options evaluated and compared?
+          - Was a formal analysis framework used (e.g., decision matrix, cost-benefit analysis)?
+          - Were proof-of-concepts or prototypes built?
+          - What research was conducted (market analysis, technical spikes)?
+          - How were stakeholders consulted?
+        examples:
+          - "Multi-criteria decision analysis using weighted scoring on cost, complexity, performance, and team readiness"
+          - "Built proof-of-concepts for top 2 options and measured performance under simulated load"
+          - "Conducted technical workshops with architecture team and reviewed industry case studies"
+      
+      - id: decision-criteria
+        title: Decision Criteria
+        type: bullet-list
+        instruction: |
+          What factors were most important in making this decision?
+          List the key criteria used to evaluate options, roughly in order of importance.
+          This helps others understand what was prioritized and why.
+        examples:
+          - "Development velocity and team autonomy"
+          - "System performance and scalability"
+          - "Implementation cost and timeline"
+          - "Operational complexity and maintenance burden"
+          - "Risk level and reversibility of decision"
+      
+      - id: stakeholders-consulted
+        title: Stakeholders Consulted
+        type: table
+        columns: [Stakeholder, Role, Input Provided, Concerns Raised]
+        instruction: |
+          Who was involved in or consulted about this decision?
+          Document their role and the nature of their input to show decision inclusiveness.
+        examples:
+          - ["Engineering Team", "Implementation", "Technical feasibility assessment", "Complexity of migration process"]
+          - ["Product Team", "Requirements", "Feature delivery impact analysis", "Timeline for customer-facing improvements"]
+          - ["DevOps Team", "Operations", "Operational readiness assessment", "Monitoring and debugging complexity"]
+          - ["Architecture Review Board", "Governance", "Technical architecture review", "Long-term maintainability"]
+
+  - id: decision
+    title: Decision
+    instruction: |
+      State the decision clearly and concisely using active voice.
+      Be specific about what will be done, by when, and under what conditions.
+      This is the most important section - it should be unambiguous.
+    elicit: true
+    template: |
+      We will **{{decision_action}}** because **{{primary_rationale}}**.
+      
+      **Specifically, this means:**
+      {{implementation_details}}
+      
+      **Timeline:** {{target_timeline}}
+      **Scope:** {{scope_boundaries}}
+    examples: |
+      **Example Decision:**
+      "We will migrate to a microservices architecture because it will enable independent 
+      team development and deployment while providing the scalability we need for projected growth.
+      
+      Specifically, this means:
+      - Extract 5 core services (User Management, Order Processing, Inventory, Payment, Notification) 
+        from the current monolith over the next 12 months
+      - Implement service mesh for inter-service communication using Istio
+      - Maintain the current monolith for shared utilities and gradual migration of remaining features
+      - All new features will be developed as separate microservices
+      
+      Timeline: Complete migration of core services by Q3 2024
+      Scope: Customer-facing services only; internal admin tools remain in monolith initially"
+
+  - id: consequences
+    title: Consequences
+    instruction: |
+      Document the expected results of this decision, both positive and negative.
+      Include both immediate effects and longer-term implications.
+      Be honest about trade-offs and potential downsides.
+    elicit: true
+    sections:
+      - id: positive-consequences
+        title: Positive Consequences
+        type: bullet-list
+        min_items: 2
+        instruction: |
+          What benefits do we expect from this decision?
+          Be specific and measurable where possible.
+        examples:
+          - "Reduced deployment time from 45 minutes to 5 minutes per service"
+          - "Improved development velocity through independent team deployments"
+          - "Better scalability - can scale individual services based on demand"
+          - "Technology diversity - teams can choose optimal tools for each service"
+          - "Improved fault isolation - service failures won't bring down entire system"
+      
+      - id: negative-consequences
+        title: Negative Consequences
+        type: bullet-list
+        min_items: 1
+        instruction: |
+          What downsides or challenges do we expect?
+          Include both immediate costs and ongoing concerns.
+        examples:
+          - "Increased operational complexity with multiple services to monitor and debug"
+          - "Network latency and reliability concerns for inter-service communication"
+          - "Data consistency challenges across service boundaries"
+          - "Additional infrastructure costs for service mesh and monitoring"
+          - "6-month period of reduced feature velocity during migration"
+      
+      - id: risks-tradeoffs
+        title: Key Risks and Trade-offs
+        type: table
+        columns: [Risk/Trade-off, Likelihood, Impact, Mitigation Strategy, Acceptance Rationale]
+        instruction: |
+          What are the major risks we're accepting with this decision?
+          How will we mitigate them and why are we accepting these trade-offs?
+        examples:
+          - ["Service coordination complexity", "High", "Medium", "Implement comprehensive service contracts and testing", "Benefits of team autonomy outweigh coordination costs"]
+          - ["Data consistency issues", "Medium", "High", "Design for eventual consistency, implement saga patterns", "Most use cases can tolerate eventual consistency"]
+          - ["Network performance impact", "Low", "Medium", "Service mesh optimization, strategic service boundaries", "Expected performance gains from better scaling outweigh network overhead"]
+
+  - id: implementation
+    title: Implementation Plan
+    instruction: |
+      How will this decision be implemented?
+      Provide enough detail for accountability and progress tracking.
+    sections:
+      - id: action-items
+        title: Action Items
+        type: table
+        columns: [Action, Owner, Due Date, Status, Dependencies]
+        instruction: |
+          Specific tasks required to implement this decision.
+          Assign clear ownership and realistic timelines.
+        examples:
+          - ["Service boundary analysis and domain modeling", "Tech Lead", "2024-01-15", "Not Started", "Architecture team alignment"]
+          - ["Set up service mesh infrastructure", "DevOps Lead", "2024-01-30", "Not Started", "Cloud infrastructure approval"]
+          - ["Define service contracts and API standards", "API Working Group", "2024-02-01", "Not Started", "Service boundaries defined"]
+          - ["Extract User Management service (pilot)", "Backend Team A", "2024-02-28", "Not Started", "Service mesh and contracts ready"]
+      
+      - id: success-criteria
+        title: Success Criteria
+        type: bullet-list
+        instruction: |
+          How will we know if this decision is working?
+          Define specific, measurable criteria for success.
+        examples:
+          - "First extracted service deployed independently within 30 days of completion"
+          - "Deployment time for new features reduced to under 10 minutes"
+          - "System availability improved to 99.9% uptime"
+          - "Developer survey shows 80% satisfaction with new development process"
+          - "No more than 5% performance degradation during migration period"
+      
+      - id: validation-approach
+        title: How We'll Validate This Decision
+        type: paragraphs
+        instruction: |
+          Describe how and when we'll assess whether this was the right decision.
+          Include both quantitative metrics and qualitative assessment approaches.
+        examples: |
+          "We will conduct formal reviews at 3, 6, and 12 months after beginning implementation. 
+          Success will be measured through deployment frequency, lead time for changes, mean time 
+          to recovery, and developer productivity metrics. We'll also survey development teams 
+          quarterly to assess satisfaction with the new architecture. If success criteria are 
+          not met by the 6-month review, we will reassess and potentially adjust the approach 
+          or timeline. A formal retrospective will be conducted 18 months post-implementation 
+          to capture lessons learned and inform future architectural decisions."
+
+  - id: alternatives-considered
+    title: Alternatives Considered and Rejected
+    instruction: |
+      For each major alternative that was seriously considered but not chosen,
+      explain why it wasn't selected and under what conditions it might be reconsidered.
+    elicit: true
+    type: numbered-list
+    template: |
+      {{number}}. **{{alternative_name}}**
+         - **Description**: {{alternative_description}}
+         - **Key advantages**: {{advantages}}
+         - **Why rejected**: {{rejection_reasons}}
+         - **Could reconsider if**: {{reconsideration_conditions}}
+    examples: |
+      1. **Continue with Monolithic Architecture**
+         - Description: Optimize existing monolith through caching, database tuning, and code refactoring
+         - Key advantages: Lower complexity, faster immediate improvements, team familiarity
+         - Why rejected: Doesn't address fundamental scalability limits or team coordination issues
+         - Could reconsider if: Team size remains under 15 developers and traffic growth slows significantly
+      
+      2. **Full Serverless Architecture**
+         - Description: Migrate entire application to AWS Lambda functions with API Gateway
+         - Key advantages: Ultimate scalability, pay-per-use pricing, no infrastructure management
+         - Why rejected: Significant vendor lock-in, complex debugging, cold start latency concerns
+         - Could reconsider if: Team gains more serverless expertise and cold start issues are resolved
+
+  - id: references
+    title: References and Supporting Materials
+    instruction: |
+      Link to relevant documentation, research, or related decisions that support this ADR.
+      This provides context and enables deeper understanding.
+    type: bullet-list
+    examples:
+      - "[Microservices Migration Strategy Document](../architecture/microservices-strategy.md)"
+      - "[Performance Benchmarking Results](../research/performance-analysis-2023.md)"
+      - "[Related ADR-003: API Gateway Selection](./ADR-003-api-gateway.md)"
+      - "[Industry Case Study: Netflix Microservices Journey](https://netflixtechblog.com/microservices-at-netflix-scale)"
+      - "[Team Survey Results: Development Pain Points](../surveys/dev-experience-q4-2023.md)"
+
+  - id: revision-history
+    title: Revision History
+    type: table
+    columns: [Date, Version, Author, Changes]
+    auto_populate: first_entry
+    instruction: |
+      Track changes to this ADR over time.
+      First entry is automatically populated when ADR is created.
+    examples:
+      - ["2024-01-10", "1.0", "Tech Lead", "Initial version - microservices decision"]
+      - ["2024-01-15", "1.1", "Architecture Team", "Added implementation timeline details"]
+      - ["2024-03-01", "2.0", "Tech Lead", "Updated based on pilot service results"]
+
+  - id: decision-outcome
+    title: Decision Outcome Tracking
+    instruction: |
+      This section will be updated after implementation to track actual vs. expected outcomes.
+      Leave blank initially - update during regular reviews.
+    elicit: false
+    sections:
+      - id: actual-benefits
+        title: Actual Benefits Realized
+        type: bullet-list
+        instruction: "Update with measurable benefits actually achieved (to be filled during reviews)"
+        template: |
+          **3-Month Review ({{review_date}}):**
+          - Benefit 1: {{actual_result}} vs. Expected: {{expected_result}}
+          - Benefit 2: {{actual_result}} vs. Expected: {{expected_result}}
+      
+      - id: unexpected-consequences
+        title: Unexpected Consequences
+        type: bullet-list
+        instruction: "Document any consequences (positive or negative) that weren't anticipated"
+        template: |
+          **Discovered During Implementation:**
+          - {{consequence}}: {{description}} - {{impact_assessment}}
+      
+      - id: lessons-learned
+        title: Lessons Learned
+        type: bullet-list
+        instruction: "Key insights for future similar decisions"
+        template: |
+          **For Future Architecture Decisions:**
+          - {{lesson}}: {{description_and_application}}
+
+  - id: related-decisions
+    title: Related Decisions
+    instruction: |
+      Link to other ADRs or decisions that are related to or affected by this decision.
+      This helps maintain coherent decision architecture.
+    type: table
+    columns: [Decision, Relationship, Impact, Notes]
+    examples:
+      - ["ADR-005: Database Strategy", "Prerequisite", "High", "Must define data boundaries before service extraction"]
+      - ["ADR-012: Monitoring Approach", "Depends on this", "Medium", "Monitoring strategy will need to support distributed services"]
+      - ["Technology Choice: Container Platform", "Enables", "High", "Kubernetes selection enables service deployment model"]
+
+# Template configuration
+configuration:
+  auto_numbering:
+    enabled: true
+    start: 1
+    format: "ADR-{:03d}"
+    scan_directory: "docs/decisions"
+  
+  file_naming:
+    pattern: "ADR-{number}-{slug}.md"
+    slug_generation:
+      max_length: 50
+      separator: "-"
+      remove_words: ["a", "an", "the", "for", "to", "in", "on", "at", "by"]
+  
+  validation:
+    required_sections: ["context", "decision", "consequences"]
+    min_alternatives: 2
+    max_title_length: 100
+  
+  templates:
+    status_change_note: |
+      **Status Change**: {{old_status}} → {{new_status}} on {{date}}
+      {{#if reason}}Reason: {{reason}}{{/if}}
+    
+    superseded_notice: |
+      ⚠️ **This decision has been superseded by [ADR-{{new_number}}](./ADR-{{new_number}}-{{new_slug}}.md)**
+    
+    review_reminder: |
+      📅 **Next Review**: {{next_review_date}}
+      🎯 **Review Focus**: {{review_focus}}

@@ -1,0 +1,363 @@
+template:
+  id: problem-definition-v1
+  name: Problem Definition Document
+  version: 1.0
+  output:
+    format: markdown
+    filename: docs/problem-definition.md
+    title: "{{problem_name}} - Problem Definition"
+
+workflow:
+  mode: interactive
+  elicitation: advanced-elicitation
+
+sections:
+  - id: executive-summary
+    title: Executive Summary
+    instruction: |
+      Provide 2-3 sentence overview of the problem, its impact, and urgency.
+      This will be read by stakeholders who need quick understanding without deep technical details.
+    elicit: false
+    template: |
+      **Problem**: {{problem_statement}}
+      **Impact**: {{business_impact}}
+      **Urgency**: {{urgency_level}}
+      **Stakeholders Affected**: {{key_stakeholders}}
+
+  - id: problem-statement
+    title: Problem Statement
+    instruction: |
+      Apply McKinsey's structured problem definition method:
+      Transform vague concerns into specific, actionable problem statements.
+      Use format: "How might we [action] for [target] to achieve [outcome] given [constraints]?"
+      
+      Example transformation:
+      Vague: "Our system is slow"
+      Structured: "How might we reduce API response time for mobile users to under 200ms during peak traffic hours given our current infrastructure budget of $50K?"
+    elicit: true
+    sections:
+      - id: current-state
+        title: Current State
+        type: paragraphs
+        instruction: |
+          Describe what is happening now that is problematic.
+          Be specific and measurable. Include:
+          - Observable symptoms and their frequency
+          - Impact on users, business, or operations
+          - Current performance metrics or baseline data
+      
+      - id: desired-state
+        title: Desired State
+        type: paragraphs
+        instruction: |
+          Describe the target state we want to achieve.
+          Must be specific, measurable, and time-bound:
+          - What would success look like?
+          - What specific outcomes are we targeting?
+          - What would be different in the desired state?
+      
+      - id: gap-analysis
+        title: Gap Analysis
+        type: bullet-list
+        instruction: |
+          List specific gaps between current and desired states.
+          Focus on:
+          - Performance gaps (quantified where possible)
+          - Capability gaps (what we can't do now but need to)
+          - Resource gaps (people, tools, budget, time)
+          - Knowledge gaps (what we don't understand yet)
+
+  - id: stakeholder-analysis
+    title: Stakeholder Analysis
+    instruction: |
+      Identify all affected parties and their perspectives on the problem.
+      Use RACI matrix thinking (Responsible, Accountable, Consulted, Informed).
+      Consider both internal and external stakeholders.
+    elicit: true
+    type: table
+    columns: [Stakeholder Group, Impact Level, Primary Concerns, Success Criteria, Influence Level]
+    min_rows: 3
+    examples:
+      - ["End Users", "High", "System downtime and slow performance", "99.9% uptime, <200ms response", "Medium"]
+      - ["Operations Team", "High", "Maintenance burden and alert fatigue", "Automated deployments, reduced incidents", "High"]
+      - ["Product Team", "Medium", "Feature velocity impact", "No development slowdown", "Medium"]
+      - ["Executive Leadership", "Medium", "Budget and strategic alignment", "ROI positive, competitive advantage", "High"]
+
+  - id: constraints-assumptions
+    title: Constraints and Assumptions
+    instruction: |
+      Document boundaries and beliefs that shape the solution space.
+      Challenge each assumption using first principles thinking:
+      - Is this truly a constraint or just current practice?
+      - What evidence supports this assumption?
+      - What would happen if this assumption were false?
+    elicit: true
+    sections:
+      - id: hard-constraints
+        title: Hard Constraints
+        type: numbered-list
+        prefix: HC
+        instruction: |
+          Immutable limitations that cannot be changed:
+          - Regulatory/legal requirements
+          - Physical laws or technical impossibilities
+          - Contractual obligations
+          - Budget caps (if truly fixed)
+        examples:
+          - "HC1: Solution must comply with GDPR data residency requirements"
+          - "HC2: Cannot exceed $100,000 total budget (board-approved ceiling)"
+          - "HC3: Must maintain 99.9% uptime during implementation (contractual SLA)"
+      
+      - id: soft-constraints
+        title: Soft Constraints
+        type: numbered-list
+        prefix: SC
+        instruction: |
+          Preferred limitations that could potentially be negotiated or changed:
+          - Timeline preferences
+          - Resource preferences
+          - Technology preferences
+          - Process preferences
+        examples:
+          - "SC1: Prefer to complete within 6 months (could extend if necessary)"
+          - "SC2: Prefer using existing technology stack (could evaluate alternatives)"
+          - "SC3: Minimal disruption to current operations (could plan maintenance windows)"
+      
+      - id: assumptions
+        title: Key Assumptions
+        type: numbered-list
+        prefix: A
+        instruction: |
+          Beliefs we're operating under - mark confidence level (1-10):
+          - Technical assumptions about system behavior
+          - User behavior assumptions
+          - Market or business environment assumptions
+          - Resource availability assumptions
+        examples:
+          - "A1: Current user traffic patterns will remain stable (confidence: 7/10)"
+          - "A2: Development team will remain at current size (confidence: 6/10)"
+          - "A3: Third-party API reliability will not improve significantly (confidence: 8/10)"
+
+  - id: problem-decomposition
+    title: Problem Decomposition
+    instruction: |
+      Break down the problem using MECE principle (Mutually Exclusive, Collectively Exhaustive).
+      Each component should be independently analyzable and solvable.
+      Choose decomposition method based on problem nature:
+      - Functional: What functions are affected?
+      - Temporal: What phases or time periods?
+      - Stakeholder: Which groups are impacted?
+      - Technical: Which system components?
+    elicit: true
+    sections:
+      - id: decomposition-method
+        title: Decomposition Method
+        type: select
+        choices: [Functional, Temporal, Spatial, Stakeholder-based, Technical-component, Process-flow]
+        instruction: Select the most appropriate way to break down this problem
+      
+      - id: components
+        title: Problem Components
+        type: hierarchical-list
+        instruction: |
+          Create 2-3 level hierarchy of problem components using chosen method.
+          Validate MECE principle:
+          - No overlaps between components at same level
+          - All aspects of parent component covered by children
+          - Components at same level are comparable in scope
+        template: |
+          **Level 1**: {{component_name}}
+          - Description: {{what_this_covers}}
+          - Impact: {{how_significant}}
+          - Sub-components:
+            - **Level 2**: {{sub_component}}
+              - Specific issue: {{detailed_description}}
+
+  - id: success-metrics
+    title: Success Metrics
+    instruction: |
+      Define measurable criteria for solution evaluation using SMART goals:
+      Specific, Measurable, Achievable, Relevant, Time-bound.
+      
+      Include both:
+      - Leading indicators (early signals of progress)
+      - Lagging indicators (final outcome measures)
+    elicit: true
+    sections:
+      - id: primary-metrics
+        title: Primary KPIs
+        type: table
+        columns: [Metric, Current Value, Target Value, Measurement Method, Timeline]
+        instruction: |
+          Most important 3-5 metrics that define success.
+          These should directly relate to the problem being solved.
+        examples:
+          - ["API Response Time", "800ms average", "<200ms 95th percentile", "APM monitoring", "3 months"]
+          - ["System Uptime", "99.5%", "99.9%", "Uptime monitoring", "6 months"]
+          - ["User Satisfaction", "3.2/5", "4.5/5", "NPS survey", "4 months"]
+      
+      - id: secondary-metrics
+        title: Secondary Indicators
+        type: bullet-list
+        instruction: |
+          Additional metrics that provide context and early warning:
+          - Process efficiency measures
+          - Cost metrics
+          - Quality indicators
+          - User adoption metrics
+        examples:
+          - "Incident response time reduced by 50%"
+          - "Development deployment frequency increased by 200%"
+          - "Customer support tickets related to performance reduced by 75%"
+
+  - id: root-cause-hypothesis
+    title: Initial Root Cause Hypotheses
+    instruction: |
+      Based on initial analysis, what might be causing this problem?
+      These are hypotheses to be tested, not conclusions.
+      Mark confidence level and evidence quality for each hypothesis.
+    elicit: true
+    type: numbered-list
+    template: |
+      {{number}}. **Hypothesis**: {{hypothesis_statement}}
+         - **Confidence Level**: {{confidence_percentage}}%
+         - **Supporting Evidence**: {{evidence_description}}
+         - **Test Method**: {{how_to_validate}}
+         - **If True, Then**: {{predicted_consequences}}
+    examples:
+      - |
+        1. **Hypothesis**: Database query inefficiency is the primary cause of slow response times
+           - **Confidence Level**: 75%
+           - **Supporting Evidence**: APM shows 60% of response time in database calls
+           - **Test Method**: Query analysis and database profiling
+           - **If True, Then**: Query optimization should yield 50%+ performance improvement
+
+  - id: solution-criteria
+    title: Solution Evaluation Criteria
+    instruction: |
+      Define how potential solutions will be evaluated and compared.
+      Weight criteria by relative importance - weights must sum to 1.0.
+      These criteria will be used in solution matrix analysis.
+    elicit: true
+    type: table
+    columns: [Criterion, Weight (0-1), Description, Measurement Method]
+    validation:
+      sum_weights: 1.0
+    examples:
+      - ["Cost", "0.25", "Total cost of ownership including development and operations", "Budget analysis"]
+      - ["Performance Impact", "0.30", "Improvement in key performance metrics", "Benchmark testing"]
+      - ["Implementation Risk", "0.20", "Technical and operational risks", "Risk assessment matrix"]
+      - ["Time to Value", "0.15", "How quickly benefits can be realized", "Timeline analysis"]
+      - ["Scalability", "0.10", "Ability to handle future growth", "Capacity modeling"]
+
+  - id: scope-boundaries
+    title: Scope Boundaries
+    instruction: |
+      Clearly define what is and is not included in this problem scope.
+      This prevents scope creep and ensures focused problem-solving.
+    sections:
+      - id: in-scope
+        title: In Scope
+        type: bullet-list
+        instruction: |
+          What is explicitly included in this problem definition:
+          - Specific systems or components
+          - User groups or scenarios
+          - Time periods or conditions
+          - Geographic or organizational boundaries
+      
+      - id: out-of-scope
+        title: Out of Scope
+        type: bullet-list
+        instruction: |
+          What is explicitly NOT included (but might be related):
+          - Related but separate problems
+          - Future enhancements beyond this problem
+          - Other systems or user groups
+          - Areas that will be addressed separately
+      
+      - id: dependencies
+        title: External Dependencies
+        type: bullet-list
+        instruction: |
+          What external factors could affect this problem or its solution:
+          - Other projects or initiatives
+          - Third-party services or vendors
+          - Organizational changes
+          - Technology or market changes
+
+  - id: risk-factors
+    title: Risk Factors
+    instruction: |
+      Identify risks that could affect problem-solving efforts or outcomes.
+      Include both risks to solving the problem and risks of not solving it.
+    type: table
+    columns: [Risk, Likelihood (L/M/H), Impact (L/M/H), Category, Mitigation Strategy]
+    examples:
+      - ["Key technical expert leaves team", "M", "H", "Resource", "Cross-train team members"]
+      - ["Third-party API changes breaking compatibility", "L", "M", "Technical", "Build abstraction layer"]
+      - ["Budget gets cut mid-project", "L", "H", "Financial", "Phase implementation approach"]
+
+  - id: next-steps
+    title: Recommended Next Steps
+    instruction: |
+      Based on this problem definition, what should happen next?
+      Prioritize immediate actions and longer-term investigation needs.
+    sections:
+      - id: immediate-actions
+        title: Immediate Actions (Next 48 hours)
+        type: numbered-list
+        instruction: |
+          Quick actions to begin addressing the problem:
+          - Data collection or measurement setup
+          - Stakeholder notifications
+          - Resource allocation
+          - Quick wins or stop-gap measures
+        examples:
+          - "Set up monitoring for key performance metrics"
+          - "Schedule stakeholder alignment meeting"
+          - "Begin database query analysis"
+      
+      - id: investigation-plan
+        title: Investigation Plan (Next 1-2 weeks)
+        type: numbered-list
+        instruction: |
+          Systematic investigation to validate hypotheses:
+          - Root cause analysis methods to apply
+          - Data to collect and analyze
+          - Experts to consult
+          - Tests or experiments to run
+        examples:
+          - "Conduct detailed root cause analysis using 5 Whys method"
+          - "Perform load testing to isolate performance bottlenecks"
+          - "Interview key users to understand impact patterns"
+      
+      - id: solution-development
+        title: Solution Development (Next 2-4 weeks)
+        type: numbered-list
+        instruction: |
+          Solution generation and evaluation process:
+          - Innovation methods to apply
+          - Solution alternatives to explore
+          - Evaluation and decision process
+          - Stakeholder review and approval
+        examples:
+          - "Generate solution alternatives using TRIZ methodology"
+          - "Create solution comparison matrix with weighted criteria"
+          - "Develop proof-of-concept for top 2 solutions"
+
+  - id: success-definition
+    title: Definition of Done
+    instruction: |
+      When can we consider this problem fully defined and ready for solution development?
+      This creates a clear checkpoint before moving to solution generation.
+    type: checklist
+    items:
+      - "All key stakeholders agree on problem statement"
+      - "Success metrics are measurable and achievable"
+      - "Root cause hypotheses are testable"
+      - "Solution evaluation criteria are weighted and validated"
+      - "Scope boundaries are clear and accepted"
+      - "Resource and timeline constraints are confirmed"
+      - "Risk mitigation strategies are in place"
+      - "Next steps are prioritized and assigned"

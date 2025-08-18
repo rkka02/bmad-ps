@@ -1,0 +1,504 @@
+workflow:
+  id: complex-problem-solving
+  name: Complex Problem Resolution
+  description: >-
+    Systematic approach to analyzing and solving complex, cross-disciplinary problems
+    using multiple analytical frameworks and innovation methodologies. Ideal for
+    problems requiring deep analysis, creative solutions, or systematic decision-making.
+  type: analysis
+  project_types:
+    - research-intensive
+    - innovation-required
+    - cross-functional-complexity
+    - architectural-decisions
+    - optimization-challenges
+    - troubleshooting-complex
+    - strategic-planning
+
+  sequence:
+    - agent: problem-solver
+      creates: problem-definition.md
+      task: create-problem-def
+      notes: |
+        **Step 1: Problem Definition & Scoping**
+        Define and systematically decompose the problem using MECE principle.
+        Identify all stakeholders, constraints, success criteria, and scope boundaries.
+        Apply McKinsey-style structured problem definition methods.
+        
+        **Key Outputs:**
+        - Clear, measurable problem statement
+        - Stakeholder analysis with impact assessment
+        - Success metrics and evaluation criteria
+        - Initial root cause hypotheses
+        
+        **SAVE OUTPUT:** Copy problem-definition.md to docs/ folder.
+
+    - agent: problem-solver
+      creates: root-cause-analysis.md
+      task: investigate-root-cause
+      requires: problem-definition.md
+      notes: |
+        **Step 2: Root Cause Investigation**
+        Apply systematic root cause analysis using method best suited to problem:
+        - Simple linear problems: 5 Whys technique
+        - Multi-factor problems: Fishbone (Ishikawa) analysis
+        - Complex systems: Fault Tree Analysis
+        - Unknown factors: Systematic experimentation
+        
+        **Key Outputs:**
+        - Validated root causes with confidence levels
+        - Supporting evidence for each cause
+        - Cause-and-effect relationships mapped
+        
+        **SAVE OUTPUT:** Copy root-cause-analysis.md to docs/ folder.
+
+    - agent: analyst
+      creates: domain-research.md
+      requires: root-cause-analysis.md
+      optional: true
+      condition: requires_domain_expertise
+      notes: |
+        **Step 3: Domain Research (Optional)**
+        Deep research into specific domain areas identified in root cause analysis.
+        Apply when problem spans unfamiliar domains or requires specialized knowledge.
+        
+        **Research Areas:**
+        - Market analysis and competitive landscape
+        - Technical feasibility studies
+        - Regulatory and compliance requirements
+        - Industry best practices and case studies
+        
+        **Trigger Conditions:**
+        - Root causes involve unfamiliar technologies
+        - Market dynamics significantly impact solution
+        - Regulatory constraints unclear
+        - Need external benchmarking data
+
+    - agent: problem-solver
+      creates: solution-options.md
+      task: generate-solutions
+      requires:
+        - problem-definition.md
+        - root-cause-analysis.md
+      notes: |
+        **Step 4: Solution Generation**
+        Apply multiple innovation frameworks to generate diverse solution approaches:
+        - TRIZ for technical contradictions
+        - Design Thinking for human-centered solutions
+        - Lateral Thinking for creative breakthroughs
+        - Biomimicry for efficiency optimization
+        - Combinatory Play for cross-domain synthesis
+        
+        **Key Outputs:**
+        - 3-7 significantly different solution approaches
+        - Innovation methods applied to each solution
+        - Preliminary feasibility assessment
+        - Risk identification for each approach
+        
+        **SAVE OUTPUT:** Copy solution-options.md to docs/ folder.
+
+    - agent: architect
+      validates: technical-feasibility.md
+      requires: solution-options.md
+      condition: has_technical_solutions
+      optional: true
+      notes: |
+        **Step 5a: Technical Validation (Conditional)**
+        Review technical solutions for feasibility, complexity, and architecture alignment.
+        Apply when solutions involve significant technical implementation.
+        
+        **Validation Focus:**
+        - Technical feasibility with current infrastructure
+        - Architecture impact and integration complexity
+        - Performance implications and scalability
+        - Implementation effort estimation
+        - Technology risk assessment
+        
+        **May result in:**
+        - Solution modifications for feasibility
+        - Additional technical alternatives
+        - Implementation approach refinements
+
+    - agent: pm
+      validates: business-viability.md
+      requires: solution-options.md
+      condition: has_business_impact
+      optional: true
+      notes: |
+        **Step 5b: Business Validation (Conditional)**
+        Assess business value, ROI, and strategic alignment of solution options.
+        Apply when solutions have significant business or financial implications.
+        
+        **Validation Focus:**
+        - Business case and ROI analysis
+        - Strategic alignment with objectives
+        - Resource requirement assessment
+        - Market timing and competitive impact
+        - Stakeholder acceptance likelihood
+        
+        **May result in:**
+        - Business constraint additions
+        - Priority adjustments
+        - Timeline modifications
+
+    - agent: problem-solver
+      creates: solution-matrix.md
+      task: create-solution-matrix
+      requires: 
+        - solution-options.md
+      notes: |
+        **Step 6: Solution Evaluation Matrix**
+        Systematic comparison of all solution options using Multi-Criteria Decision Analysis.
+        Score solutions against weighted criteria from problem definition.
+        
+        **Analysis Components:**
+        - Quantitative scoring (1-10 scale) on all criteria
+        - Weighted total calculation
+        - Sensitivity analysis for robustness
+        - Scenario analysis (optimistic/pessimistic/disruptive)
+        - Risk-adjusted recommendations
+        
+        **Key Outputs:**
+        - Ranked solution options with scores
+        - Decision rationale and trade-offs
+        - Sensitivity analysis results
+        - Recommended approach with confidence level
+        
+        **SAVE OUTPUT:** Copy solution-matrix.md to docs/ folder.
+
+    - agent: problem-solver
+      creates: decision-record.md
+      task: create-decision-record
+      requires: solution-matrix.md
+      notes: |
+        **Step 7: Decision Documentation**
+        Create Architectural Decision Record (ADR) documenting the final decision.
+        Capture context, alternatives, rationale, and consequences for future reference.
+        
+        **ADR Components:**
+        - Decision context and forces
+        - All alternatives considered
+        - Decision rationale and criteria
+        - Expected consequences and trade-offs
+        - Implementation plan and success criteria
+        - Risk mitigation strategies
+        
+        **Key Outputs:**
+        - Formal ADR with decision rationale
+        - Implementation roadmap
+        - Success measurement plan
+        - Risk management approach
+        
+        **SAVE OUTPUT:** Copy to docs/decisions/ folder with ADR number.
+
+    - agent: po
+      validates: decision-alignment.md
+      requires: 
+        - problem-definition.md
+        - solution-matrix.md
+        - decision-record.md
+      notes: |
+        **Step 8: Decision Validation**
+        Product Owner validates final decision against original problem definition.
+        Ensure all constraints satisfied and stakeholder concerns addressed.
+        
+        **Validation Checklist:**
+        - Decision addresses root problem (not just symptoms)
+        - All hard constraints respected
+        - Success criteria are achievable
+        - Stakeholder concerns addressed
+        - Risk mitigation adequate
+        - Implementation plan realistic
+        
+        **May trigger:**
+        - Return to solution matrix for refinement
+        - Additional stakeholder consultation
+        - Risk mitigation enhancement
+        - Implementation plan adjustment
+
+    - handoff_options:
+        to_development:
+          condition: requires_implementation
+          next_workflow: development-workflow
+          handoff_agent: sm
+          notes: |
+            **Handoff to Development**
+            When solution requires software/system implementation:
+            - SM agent creates implementation stories
+            - Development workflow takes over
+            - Regular progress reviews against success criteria
+        
+        to_pilot_program:
+          condition: requires_validation
+          next_workflow: pilot-validation
+          handoff_agent: pm
+          notes: |
+            **Handoff to Pilot Program**
+            When solution needs real-world validation:
+            - PM designs pilot program
+            - Controlled rollout with measurement
+            - Results inform full implementation decision
+        
+        to_change_management:
+          condition: organizational_change
+          next_workflow: change-management
+          handoff_agent: analyst
+          notes: |
+            **Handoff to Change Management**
+            When solution requires organizational change:
+            - Analyst designs change management approach
+            - Stakeholder communication and training
+            - Change resistance management
+        
+        to_monitoring:
+          condition: monitoring_only
+          next_steps: 
+            - Set up success metrics monitoring
+            - Schedule regular review cycles
+            - Document lessons learned
+          notes: |
+            **Handoff to Monitoring**
+            When solution is decision/policy only:
+            - Implement monitoring systems
+            - Regular effectiveness reviews
+            - Continuous improvement process
+
+  flow_diagram: |
+    ```mermaid
+    graph TD
+        A[Start: Complex Problem] --> B[problem-solver: Problem Definition]
+        B --> C[problem-solver: Root Cause Analysis]
+        C --> D{Domain Research Needed?}
+        D -->|Yes| E[analyst: Domain Research]
+        D -->|No| F[problem-solver: Solution Generation]
+        E --> F
+        F --> G{Technical Solutions?}
+        F --> H{Business Impact?}
+        G -->|Yes| I[architect: Technical Validation]
+        H -->|Yes| J[pm: Business Validation]
+        G -->|No| K[problem-solver: Solution Matrix]
+        H -->|No| K
+        I --> K
+        J --> K
+        K --> L[problem-solver: Decision Record]
+        L --> M[po: Decision Validation]
+        M --> N{Validation Pass?}
+        N -->|No| O[Refine Solution Matrix]
+        N -->|Yes| P{Next Steps?}
+        O --> K
+        P -->|Implement| Q[→ Development Workflow]
+        P -->|Pilot| R[→ Pilot Program]
+        P -->|Change Mgmt| S[→ Change Management]
+        P -->|Monitor| T[Set Up Monitoring]
+        
+        style B fill:#FFD700
+        style C fill:#FFD700
+        style F fill:#FFD700
+        style K fill:#FFD700
+        style L fill:#FFD700
+        style Q fill:#90EE90
+        style R fill:#90EE90
+        style S fill:#90EE90
+        style T fill:#90EE90
+    ```
+
+  decision_guidance:
+    when_to_use:
+      - Problem spans multiple domains or systems
+      - Root cause unknown or disputed among stakeholders
+      - Multiple solution approaches are possible
+      - High-stakes decisions with significant impact
+      - Innovation or creative thinking required
+      - Traditional approaches have failed
+      - Systematic analysis needed for justification
+      - Cross-functional alignment required
+
+    when_not_to_use:
+      - Simple, well-understood problems
+      - Single obvious solution exists
+      - Time-critical urgent fixes needed
+      - Stakeholders already aligned on approach
+      - Problem is purely operational (not strategic)
+
+    complexity_indicators:
+      simple:
+        characteristics:
+          - Single domain affected
+          - Known solution patterns exist
+          - Clear requirements and constraints
+          - Minimal stakeholder disagreement
+        use_instead: Standard development workflows
+      
+      moderate:
+        characteristics:
+          - 2-3 domains involved
+          - Some uncertainty in requirements
+          - Multiple stakeholders with different priorities
+          - Trade-offs between competing objectives
+        optional_use: Selected steps from this workflow
+      
+      complex:
+        characteristics:
+          - Cross-disciplinary challenges
+          - Unknown or disputed root causes
+          - Conflicting stakeholder requirements
+          - Innovation required for solution
+        recommended: Full complex-problem-solving workflow
+      
+      wicked:
+        characteristics:
+          - Problem definition itself disputed
+          - Solutions create new problems
+          - Stakeholders fundamentally disagree
+          - Multiple interdependent challenges
+        required: Iterative application of this workflow
+
+  workflow_adaptations:
+    rapid_mode:
+      description: Accelerated version for time-sensitive problems
+      modifications:
+        - Combine problem definition and root cause into single session
+        - Generate 3 solutions maximum
+        - Skip optional validation steps
+        - Use simplified decision matrix
+      timeline: 1-2 days instead of 1-2 weeks
+    
+    collaborative_mode:
+      description: Enhanced stakeholder involvement throughout
+      modifications:
+        - Include stakeholder workshops at each major step
+        - Add consensus-building activities
+        - Multiple validation rounds
+        - Stakeholder sign-off at each phase
+      timeline: Extended by 50% for collaboration time
+    
+    iterative_mode:
+      description: For evolving or unclear problems
+      modifications:
+        - Repeat problem definition after learning
+        - Multiple solution generation cycles
+        - Pilot testing integrated into workflow
+        - Regular reassessment of problem framing
+      timeline: Multiple cycles over several months
+
+  integration_points:
+    from_other_workflows:
+      - Standard workflows encountering unexpected complexity
+      - Development workflows blocked by unclear requirements
+      - Architecture decisions with multiple viable options
+      - Business strategy requiring systematic analysis
+    
+    to_other_workflows:
+      - Greenfield/brownfield development workflows
+      - Change management processes
+      - Research and validation workflows
+      - Monitoring and optimization cycles
+
+  success_metrics:
+    process_metrics:
+      - Stakeholder alignment on problem definition (>90%)
+      - Root cause validation confidence (>80%)
+      - Solution option diversity (3+ fundamentally different approaches)
+      - Decision confidence level (High/Medium/Low)
+      - Implementation readiness score
+    
+    outcome_metrics:
+      - Problem resolution effectiveness
+      - Solution implementation success rate
+      - Stakeholder satisfaction with decision process
+      - Time from problem identification to resolution
+      - Learning transfer to future similar problems
+
+  common_failure_modes:
+    - Insufficient time spent on problem definition
+    - Stopping at symptoms rather than root causes  
+    - Single-method bias in solution generation
+    - Inadequate stakeholder validation
+    - Poor documentation of decision rationale
+    - Skipping sensitivity analysis
+    - Weak implementation handoff
+
+  mitigation_strategies:
+    - Enforce minimum time allocation for each phase
+    - Require multiple analytical methods application
+    - Include diverse perspectives at each step
+    - Document assumptions and validate regularly
+    - Test decision robustness through scenario analysis
+    - Create clear handoff protocols and success criteria
+
+handoff_prompts:
+  start_workflow: |
+    "You have a complex problem requiring systematic analysis. This workflow will guide you through:
+    1. Structured problem definition and decomposition
+    2. Root cause investigation using proven methods
+    3. Creative solution generation with multiple innovation frameworks
+    4. Systematic decision analysis with quantitative evaluation
+    5. Documented decision record for future reference
+    
+    Expected timeline: 1-2 weeks for thorough analysis
+    Begin with problem-solver agent for problem definition."
+  
+  problem_to_research: |
+    "Problem definition and root cause analysis complete. Root causes identified in domains requiring specialized knowledge. 
+    Analyst: Please conduct deep research in [specific domains] to inform solution development."
+  
+  solutions_to_validation: |
+    "Solution options generated using multiple innovation frameworks. 
+    Architect/PM: Please validate solutions for [technical feasibility / business viability] 
+    and provide feedback for refinement."
+  
+  matrix_to_decision: |
+    "Solution evaluation matrix complete with quantitative scoring and sensitivity analysis. 
+    Top recommendation: [Solution X] with [score] confidence.
+    Ready for formal decision record creation."
+  
+  decision_to_validation: |
+    "Decision record complete with full rationale and implementation plan.
+    PO: Please validate decision against original problem definition and stakeholder requirements."
+  
+  validation_to_implementation: |
+    "Complex problem analysis complete. Decision validated and documented.
+    Ready for handoff to [development/pilot/change management] workflow.
+    All analysis artifacts available in docs/ folder."
+
+workflow_templates:
+  problem_complexity_assessment: |
+    **Problem Complexity Quick Assessment:**
+    
+    Rate each dimension 1-5 (1=Simple, 5=Complex):
+    - Domain breadth: How many different areas does this span?
+    - Stakeholder disagreement: How much do stakeholders disagree?
+    - Solution uncertainty: How unclear are potential solutions?
+    - Impact significance: How significant are the consequences?
+    - Time sensitivity: How much time is available for analysis?
+    
+    **Scoring:**
+    - 5-10: Use standard workflows with selected problem-solving techniques
+    - 11-15: Use abbreviated complex-problem-solving workflow
+    - 16-20: Use full complex-problem-solving workflow
+    - 21-25: Use iterative complex-problem-solving with multiple cycles
+  
+  stakeholder_alignment_check: |
+    **Stakeholder Alignment Verification:**
+    
+    Before proceeding to implementation, verify:
+    - [ ] All key stakeholders reviewed decision record
+    - [ ] Concerns and objections have been addressed
+    - [ ] Implementation approach is understood and accepted
+    - [ ] Success criteria are agreed upon
+    - [ ] Resource commitments are confirmed
+    - [ ] Timeline and milestones are realistic
+    
+    If any item unchecked, return to appropriate workflow step for resolution.
+
+reference_materials:
+  - methodology_source: "McKinsey Problem Solving Approach"
+    application: "Problem definition and structuring methods"
+  - methodology_source: "Toyota Production System (5 Whys)"
+    application: "Root cause analysis for linear problems"
+  - methodology_source: "TRIZ (Theory of Inventive Problem Solving)"
+    application: "Systematic innovation and contradiction resolution"
+  - methodology_source: "Design Council (Double Diamond)"
+    application: "Divergent-convergent solution development"
+  - methodology_source: "Multi-Criteria Decision Analysis (MCDA)"
+    application: "Quantitative solution evaluation and selection"

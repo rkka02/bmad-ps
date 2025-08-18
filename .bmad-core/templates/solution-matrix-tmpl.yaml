@@ -1,0 +1,535 @@
+template:
+  id: solution-matrix-v1
+  name: Solution Comparison Matrix
+  version: 1.0
+  output:
+    format: markdown
+    filename: docs/solution-matrix.md
+    title: "{{problem_name}} - Solution Options Analysis"
+
+workflow:
+  mode: interactive
+  elicitation: advanced-elicitation
+
+sections:
+  - id: problem-recap
+    title: Problem Context Recap
+    instruction: |
+      Brief reminder of the problem being solved for context.
+      Reference the original problem definition document.
+    elicit: false
+    template: |
+      **Problem**: {{problem_statement}}
+      **Key Stakeholders**: {{primary_stakeholders}}
+      **Success Criteria**: {{main_success_metrics}}
+      **Constraints**: {{major_constraints}}
+      **Reference**: [Problem Definition]({{problem_def_link}})
+
+  - id: solution-generation-summary
+    title: Solution Generation Methods Applied
+    instruction: |
+      Document which innovation frameworks were used to generate solutions.
+      This provides transparency about the solution development process.
+    elicit: true
+    type: checklist
+    options:
+      - TRIZ (Systematic Innovation through contradiction resolution)
+      - Design Thinking (Human-centered innovation process)  
+      - Lateral Thinking (Pattern-breaking creative techniques)
+      - Biomimicry (Nature-inspired solutions)
+      - First Principles Reconstruction (Building from fundamentals)
+      - Analogical Reasoning (Solutions from other domains)
+      - Combinatory Play (Cross-domain synthesis)
+      - Brainstorming (Divergent idea generation)
+    additional_methods:
+      type: text
+      instruction: List any other innovation methods used
+
+  - id: evaluation-criteria
+    title: Solution Evaluation Criteria
+    instruction: |
+      Define the criteria that will be used to evaluate and compare solutions.
+      These should come from the problem definition document.
+      Weights must sum to 1.0 for mathematical validity.
+    elicit: true
+    type: table
+    columns: [Criterion, Weight (0-1), Description, Measurement Approach, Direction]
+    validation:
+      sum_weights: 1.0
+      min_criteria: 4
+      max_criteria: 8
+    examples:
+      - ["Cost Effectiveness", "0.25", "Total cost of ownership including development and operations", "Budget analysis and TCO modeling", "minimize"]
+      - ["Performance Impact", "0.30", "Improvement in key performance metrics", "Benchmark testing and simulation", "maximize"]
+      - ["Implementation Risk", "0.20", "Technical, operational, and business risks", "Risk assessment matrix", "minimize"]
+      - ["Time to Value", "0.15", "Speed of benefit realization", "Timeline analysis and milestones", "maximize"]
+      - ["Scalability", "0.10", "Ability to handle future growth and changes", "Capacity modeling and flexibility analysis", "maximize"]
+
+  - id: solution-options
+    title: Solution Option {{solution_number}}
+    repeatable: true
+    max_items: 8
+    instruction: |
+      Document each solution option comprehensively.
+      Include enough detail for evaluation but maintain focus on the approach rather than implementation details.
+      Each solution should represent a significantly different approach to the problem.
+    elicit: true
+    sections:
+      - id: solution-overview
+        title: "Solution {{solution_number}}: {{solution_name}}"
+        sections:
+          - id: description
+            title: Overview
+            type: paragraphs
+            min_length: 100
+            instruction: |
+              2-3 paragraph description of the solution approach:
+              - What is the core concept or mechanism?
+              - How does this address the root problem?
+              - What makes this approach unique or different?
+          
+          - id: innovation-source
+            title: Innovation Principle Applied
+            type: text
+            instruction: |
+              Which creative principle, method, or inspiration led to this solution?
+              Examples:
+              - "TRIZ Principle #15: Segmentation applied to data processing"
+              - "Biomimicry: Ant colony optimization for load balancing"
+              - "Lateral thinking: Random input 'pizza delivery' suggested hot-swap approach"
+          
+          - id: key-features
+            title: Key Features and Components
+            type: bullet-list
+            min_items: 3
+            instruction: |
+              Major capabilities, components, or characteristics of this solution:
+              Focus on what makes this solution effective and distinctive
+            examples:
+              - "Real-time adaptive load balancing based on traffic patterns"
+              - "Zero-downtime deployment with automatic rollback capability" 
+              - "Intelligent caching layer with predictive pre-loading"
+      
+      - id: implementation-approach
+        title: Implementation Approach
+        type: numbered-list
+        instruction: |
+          High-level steps to implement this solution:
+          - Keep at strategic level, not tactical details
+          - Include major phases or milestones
+          - Identify critical path dependencies
+          - Estimate rough timelines for each phase
+        examples:
+          - "Phase 1: Infrastructure setup and tooling (4 weeks)"
+          - "Phase 2: Core algorithm implementation and testing (8 weeks)"
+          - "Phase 3: Integration and performance optimization (6 weeks)"
+          - "Phase 4: Gradual rollout and monitoring setup (4 weeks)"
+      
+      - id: advantages-disadvantages
+        title: Advantages and Disadvantages
+        sections:
+          - id: advantages
+            title: Key Advantages
+            type: bullet-list
+            min_items: 3
+            instruction: |
+              Major benefits and strengths of this approach:
+              - Why would we choose this solution?
+              - What problems does it solve particularly well?
+              - What unique value does it provide?
+            examples:
+              - "Provides 10x performance improvement based on similar implementations"
+              - "Uses existing team expertise, minimizing learning curve"
+              - "Creates reusable platform for future optimization needs"
+          
+          - id: disadvantages
+            title: Key Disadvantages
+            type: bullet-list
+            min_items: 2
+            instruction: |
+              Major limitations, concerns, or weaknesses:
+              - What are the main drawbacks?
+              - Where does this solution fall short?
+              - What problems might it create?
+            examples:
+              - "Requires significant upfront investment in new infrastructure"
+              - "Adds complexity to current system architecture"
+              - "Depends on third-party service with vendor lock-in risk"
+      
+      - id: risk-assessment
+        title: Risk Assessment
+        type: table
+        columns: [Risk, Likelihood (L/M/H), Impact (L/M/H), Mitigation Strategy, Risk Owner]
+        instruction: |
+          Identify and assess key risks specific to this solution:
+          - Technical risks (implementation challenges)
+          - Business risks (market, competitive, financial)
+          - Operational risks (maintenance, support, scalability)
+          - Strategic risks (alignment, capability, timing)
+        examples:
+          - ["New technology adoption challenges", "M", "H", "Proof-of-concept and training program", "Tech Lead"]
+          - ["Third-party service reliability", "L", "M", "Multi-vendor strategy and SLA monitoring", "Operations"]
+          - ["Team capacity constraints", "H", "M", "Hire contractors or extend timeline", "Project Manager"]
+      
+      - id: resource-requirements
+        title: Resource Requirements
+        sections:
+          - id: human-resources
+            title: Team Requirements
+            type: bullet-list
+            instruction: |
+              What roles, skills, and team composition is needed:
+              - Specific expertise required
+              - Team size and structure
+              - External resources (consultants, vendors)
+            examples:
+              - "2 Senior Backend Developers (Python/FastAPI experience)"
+              - "1 DevOps Engineer (Kubernetes and monitoring expertise)"
+              - "1 Database Specialist (PostgreSQL optimization)"
+              - "External consultant for initial architecture review"
+          
+          - id: technology-resources
+            title: Technology and Infrastructure
+            type: bullet-list
+            instruction: |
+              Technology stack, tools, and infrastructure needed:
+              - New software licenses or tools
+              - Hardware or cloud resources
+              - Development and testing environments
+            examples:
+              - "Additional cloud instances for load testing environment"
+              - "Performance monitoring tools (DataDog, New Relic)"
+              - "CI/CD pipeline enhancement for automated testing"
+          
+          - id: budget-estimate
+            title: Budget Estimate
+            type: table
+            columns: [Category, One-time Cost, Annual Cost, Notes]
+            instruction: |
+              High-level cost breakdown for planning purposes:
+              - Development costs (internal team time)
+              - Technology costs (licenses, cloud, tools)
+              - External costs (consultants, training)
+              - Operational costs (ongoing maintenance, support)
+            examples:
+              - ["Development Team", "$180,000", "$0", "3 developers × 6 months × $10K/month"]
+              - ["Cloud Infrastructure", "$5,000", "$24,000", "Additional compute and storage"]
+              - ["Monitoring Tools", "$0", "$12,000", "APM and logging platform"]
+
+  - id: quantitative-evaluation
+    title: Quantitative Solution Evaluation
+    instruction: |
+      Score each solution against the defined criteria using a consistent scale.
+      Use 1-10 scale where 10 is best for that criterion.
+      Provide rationale for scores to ensure consistency and transparency.
+    elicit: true
+    type: dynamic-table
+    structure:
+      rows: solutions
+      columns: criteria
+      cells: scores (1-10)
+    scoring_guidance: |
+      Scoring Scale:
+      - 10-9: Exceptional performance on this criterion
+      - 8-7: Good performance, clearly above average
+      - 6-5: Average or adequate performance
+      - 4-3: Below average, some concerns
+      - 2-1: Poor performance, major issues
+    
+    template: |
+      | Solution | {{criteria_names}} | Weighted Score |
+      |----------|-------------------|----------------|
+      {{#each solutions}}
+      | {{name}} | {{#each scores}}{{this}}{{/each}} | **{{weighted_total}}** |
+      {{/each}}
+      
+      ### Scoring Rationale
+      {{#each solutions}}
+      **{{name}}:**
+      {{#each criteria_scores}}
+      - {{criterion}}: {{score}}/10 - {{rationale}}
+      {{/each}}
+      {{/each}}
+
+  - id: sensitivity-analysis
+    title: Sensitivity Analysis
+    instruction: |
+      Test how robust the decision is to changes in weights and scores.
+      This identifies which assumptions are critical to the decision.
+    elicit: false
+    auto_generate: true
+    sections:
+      - id: weight-sensitivity
+        title: Criteria Weight Sensitivity
+        instruction: |
+          Analyze how changes in criteria weights affect the ranking:
+          - Which criteria changes would alter the top choice?
+          - How much would weights need to change?
+          - Which solutions are robust across weight variations?
+        template: |
+          **Critical Weight Thresholds:**
+          {{#each weight_sensitivity}}
+          - {{criterion}}: Current {{current_weight}}% → Decision changes if {{direction}} {{threshold_weight}}%
+          {{/each}}
+          
+          **Robustness Assessment:** {{overall_robustness}}
+      
+      - id: score-sensitivity
+        title: Score Sensitivity
+        instruction: |
+          Analyze how changes in individual scores affect the ranking:
+          - Which scores are most critical to the decision?
+          - How certain are we about uncertain scores?
+          - What additional data would improve confidence?
+        template: |
+          **Critical Score Dependencies:**
+          {{#each score_sensitivity}}
+          - {{solution}} on {{criterion}}: ±{{threshold_change}} points would change ranking
+          {{/each}}
+
+  - id: qualitative-comparison
+    title: Qualitative Solution Comparison
+    instruction: |
+      Beyond numerical scores, compare solutions on strategic and qualitative dimensions.
+      Consider factors that are hard to quantify but important for decision-making.
+    elicit: true
+    sections:
+      - id: strategic-alignment
+        title: Strategic Alignment
+        type: table
+        columns: [Solution, Strategic Fit, Innovation Level, Future Opportunities, Competitive Advantage]
+        instruction: |
+          Assess how each solution aligns with broader strategic objectives:
+          - Does this build strategic capabilities?
+          - How innovative is this approach?
+          - What future opportunities does this create?
+          - Does this provide competitive differentiation?
+      
+      - id: execution-confidence
+        title: Execution Confidence
+        type: table
+        columns: [Solution, Team Readiness, Technology Maturity, Complexity Level, Success Likelihood]
+        instruction: |
+          Evaluate confidence in successful execution:
+          - How ready is the team for this approach?
+          - How mature/proven is the technology?
+          - How complex is the implementation?
+          - What's the likelihood of successful delivery?
+      
+      - id: stakeholder-preference
+        title: Stakeholder Preferences
+        type: table  
+        columns: [Solution, User Impact, Business Value, Technical Team, Operations Team, Leadership]
+        instruction: |
+          Consider how different stakeholder groups view each solution:
+          - Which solutions do users prefer?
+          - Which provides the most business value?
+          - Which does the technical team favor?
+          - Which operations team can best support?
+          - Which aligns with leadership priorities?
+
+  - id: scenario-analysis
+    title: Scenario Analysis
+    instruction: |
+      Consider how solutions perform under different future scenarios.
+      This helps evaluate robustness and adaptability of each approach.
+    elicit: true
+    sections:
+      - id: optimistic-scenario
+        title: Optimistic Scenario
+        instruction: "If everything goes better than expected (more resources, fewer constraints, rapid adoption)"
+        type: bullet-list
+        template: |
+          **Scenario**: {{scenario_description}}
+          
+          **Solution Performance:**
+          {{#each solutions}}
+          - **{{name}}**: {{performance_in_scenario}}
+          {{/each}}
+      
+      - id: pessimistic-scenario
+        title: Pessimistic Scenario
+        instruction: "If things go worse than expected (budget cuts, technical challenges, slow adoption)"
+        type: bullet-list
+        template: |
+          **Scenario**: {{scenario_description}}
+          
+          **Solution Performance:**
+          {{#each solutions}}
+          - **{{name}}**: {{performance_in_scenario}}
+          {{/each}}
+      
+      - id: disruptive-scenario
+        title: Disruptive Change Scenario
+        instruction: "If major external changes occur (new technology, market shift, regulatory change)"
+        type: bullet-list
+        template: |
+          **Scenario**: {{scenario_description}}
+          
+          **Solution Adaptability:**
+          {{#each solutions}}
+          - **{{name}}**: {{adaptability_assessment}}
+          {{/each}}
+
+  - id: recommendation
+    title: Final Recommendation
+    instruction: |
+      Based on systematic analysis, provide clear recommendation with comprehensive rationale.
+      Address why other options were not selected and acknowledge key risks/limitations.
+    elicit: true
+    sections:
+      - id: recommended-solution
+        title: Primary Recommendation
+        template: |
+          **Recommended Solution**: {{selected_solution_name}}
+          **Weighted Score**: {{final_score}}/10
+          **Confidence Level**: {{confidence_level}} (High/Medium/Low)
+          **Expected Timeline**: {{implementation_timeline}}
+          **Estimated Investment**: {{total_investment}}
+      
+      - id: decision-rationale
+        title: Decision Rationale
+        type: paragraphs
+        min_length: 150
+        instruction: |
+          Comprehensive explanation of why this solution was chosen:
+          - What were the decisive factors?
+          - How does this best address the core problem?
+          - What makes this superior to alternatives?
+          - How does this align with strategic objectives?
+      
+      - id: alternative-analysis
+        title: Why Other Options Were Not Selected
+        type: numbered-list
+        instruction: |
+          For each major alternative, explain why it wasn't chosen:
+          - What were the key weaknesses or concerns?
+          - What would need to change for this to become viable?
+          - Under what circumstances might this be reconsidered?
+        template: |
+          {{number}}. **{{solution_name}}** (Score: {{score}}/10)
+             - **Main concerns**: {{key_weaknesses}}
+             - **Could be viable if**: {{conditions_for_viability}}
+      
+      - id: implementation-roadmap
+        title: Implementation Roadmap
+        type: table
+        columns: [Phase, Timeline, Key Deliverables, Success Criteria, Risk Mitigation]
+        instruction: |
+          High-level plan for implementing the recommended solution:
+          - Break into 3-5 major phases
+          - Define clear milestones and success criteria
+          - Identify key risk mitigation activities
+        examples:
+          - ["Discovery", "Weeks 1-2", "Technical design, team formation", "Design approved by stakeholders", "Architecture review with external expert"]
+          - ["Foundation", "Weeks 3-8", "Core infrastructure, basic functionality", "Proof-of-concept demonstrates 50% improvement", "Regular checkpoint reviews"]
+          - ["Implementation", "Weeks 9-16", "Full feature development", "All acceptance criteria met", "Continuous integration and testing"]
+
+  - id: contingency-planning
+    title: Contingency Planning
+    instruction: |
+      Plan for what to do if the recommended solution encounters major problems.
+      This provides options and reduces decision risk.
+    sections:
+      - id: pivot-criteria
+        title: Pivot Criteria
+        type: bullet-list
+        instruction: |
+          Under what conditions would we reconsider the decision?
+          - Performance targets not met by milestone X
+          - Budget overruns exceed Y%
+          - Technical feasibility issues discovered
+          - Market or business context changes significantly
+      
+      - id: fallback-options
+        title: Fallback Options
+        type: numbered-list
+        instruction: |
+          If we need to change course, what are the alternatives?
+          - Quick pivot to alternative solution
+          - Hybrid approach combining multiple solutions
+          - Phase rollback and restart with different option
+          - Minimum viable solution while regrouping
+      
+      - id: early-warning-indicators
+        title: Early Warning Indicators
+        type: table
+        columns: [Indicator, Measurement, Warning Threshold, Response Action]
+        instruction: |
+          Metrics to monitor that would signal need for course correction:
+          - Technical progress indicators
+          - Budget and timeline indicators  
+          - Quality and risk indicators
+          - Stakeholder satisfaction indicators
+
+  - id: success-measurement
+    title: Success Measurement Plan
+    instruction: |
+      Define how success will be measured and validated after implementation.
+      This closes the loop on the problem-solving process.
+    sections:
+      - id: success-metrics
+        title: Success Metrics and Targets
+        type: table
+        columns: [Metric, Baseline, Target, Measurement Method, Review Frequency]
+        instruction: Reference metrics from problem definition and specify targets
+      
+      - id: evaluation-timeline
+        title: Evaluation Timeline
+        type: bullet-list
+        instruction: |
+          When and how will success be evaluated:
+          - Immediate indicators (first 30 days)
+          - Short-term success (3-6 months)
+          - Long-term impact (12+ months)
+          - Formal review and lessons learned sessions
+      
+      - id: course-correction
+        title: Course Correction Process
+        instruction: |
+          How will adjustments be made based on results:
+          - Regular review cadence and participants
+          - Decision-making process for modifications
+          - Budget and timeline adjustment procedures
+          - Communication plan for changes
+
+  - id: appendices
+    title: Supporting Analysis
+    sections:
+      - id: calculation-details
+        title: Score Calculation Details
+        instruction: Show mathematical details of weighted scoring for transparency
+        template: |
+          **Weighted Score Calculation:**
+          
+          For each solution:
+          ```
+          Weighted Score = Σ(Criterion_Weight × Normalized_Score)
+          ```
+          
+          **Example for {{top_solution}}:**
+          {{#each criteria}}
+          - {{name}}: {{weight}} × {{score}} = {{contribution}}
+          {{/each}}
+          **Total**: {{total_score}}
+      
+      - id: assumptions-log
+        title: Key Assumptions Made
+        type: bullet-list
+        instruction: |
+          Document major assumptions made during analysis:
+          - Scoring assumptions and rationale
+          - Weight assignment assumptions
+          - Implementation assumptions
+          - Market/business assumptions
+      
+      - id: data-sources
+        title: Data Sources and References
+        type: bullet-list
+        instruction: |
+          Document sources used for scoring and analysis:
+          - Internal data and metrics
+          - Industry benchmarks
+          - Expert opinions
+          - Market research
+          - Technical documentation
